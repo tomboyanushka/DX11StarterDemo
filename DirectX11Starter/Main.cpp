@@ -20,6 +20,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 					int nCmdShow)
 {
 
+	//MessageBox(NULL,
+	//	"whatever",
+	//	"whatever",
+	//	MB_ICONEXCLAMATION | MB_OK);
+
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif

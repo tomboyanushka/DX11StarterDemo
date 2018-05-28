@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DXCore.h" />
     <ClInclude Include="Main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DXCore.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
