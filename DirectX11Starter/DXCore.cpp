@@ -18,14 +18,12 @@ bool debugTitleBarStats)
 {
 	DXCoreInstance = this;
 
-	// Save params
 	this->hInstance = hInstance;
 	this->titleBartext = titleBarText;
 	this->width = windowWidth;
 	this->height = windowHeight;
 	this->titleBarStats = debugTitleBarStats;
 
-	// Initialize fields
 	fpsFrameCount = 0;
 	fpsTimeElapsed = 0.0f;
 
@@ -35,7 +33,6 @@ bool debugTitleBarStats)
 	backBufferRTV = 0;
 	depthStencilView = 0;
 
-	// Query performance counter for accurate timing information
 	__int64 perfFreq;
 	QueryPerformanceFrequency((LARGE_INTEGER*)&perfFreq);
 	perfCounterSeconds = 1.0 / (double)perfFreq;
@@ -53,10 +50,7 @@ DXCore::~DXCore()
 	if (device) { device->Release(); }
 }
 
-LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return LRESULT();
-}
+
 
 HRESULT DXCore::InitWndow()
 {
@@ -110,5 +104,99 @@ HRESULT DXCore::InitWndow()
 	ShowWindow(hWnd, SW_SHOW);
 
 	return S_OK;
+}
+
+HRESULT DXCore::InitDirectX() //requires a window
+{
+	unsigned int deviceFlags = 0;
+
+#if defined(DEBUG) || defined(_DEBUG)
+
+	deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+
+#endif
+
+	//handles two buffers, aka page flipping
+	DXGI_SWAP_CHAIN_DESC swapDesc = {};
+	swapDesc.BufferCount = 1;
+	swapDesc.BufferDesc.Width = width;
+	swapDesc.BufferDesc.Height = height;
+	swapDesc.BufferDesc.RefreshRate.Numerator = 60;
+	swapDesc.BufferDesc.RefreshRate.Denominator = 1;
+	swapDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapDesc.Flags = 0;
+	swapDesc.OutputWindow = hWnd;
+	swapDesc.SampleDesc.Count = 1;
+	swapDesc.SampleDesc.Quality = 0;
+	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapDesc.Windowed = true;
+
+	HRESULT hr = S_OK;
+
+	hr = D3D11CreateDeviceAndSwapChain(
+		0,
+		D3D_DRIVER_TYPE_HARDWARE,
+		0,
+		deviceFlags,
+		0,
+		0,
+		D3D11_SDK_VERSION,
+		&swapDesc,
+		&swapChain,
+		&device,
+		&dxFeatureLevel,
+		&context);
+
+	if (FAILED(hr)) return hr;
+
+	ID3D11Texture2D* backBufferTexture;
+	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture);
+
+	device->CreateRenderTargetView(
+		backBufferTexture,
+		0,
+		&backBufferRTV);
+	backBufferTexture->Release();
+
+
+	D3D11_TEXTURE2D_DESC depthStencilDesc = {};
+	depthStencilDesc.Width = width;
+	depthStencilDesc.Height = height;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+
+	ID3D11Texture2D* depthBufferTexture;
+	device->CreateTexture2D(&depthStencilDesc, 0, &depthBufferTexture);
+	device->CreateDepthStencilView(depthBufferTexture, 0, &depthStencilView);
+	depthBufferTexture->Release();
+
+	context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
+
+	D3D11_VIEWPORT viewport = {};
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = (float)width;
+	viewport.Height = (float)height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	context->RSSetViewports(1, &viewport);
+
+	return S_OK;
+
+}
+
+LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return LRESULT();
 }
 
