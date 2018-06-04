@@ -25,9 +25,8 @@ public:
 	HRESULT InitWndow(); //before we can initialize DirectX 
 	HRESULT InitDirectX();
 	HRESULT Run();
-	/*void Quit();
-	virtual void OnResize();*/
-
+	void Quit();
+	virtual void OnResize();
 	virtual void Init() = 0;
 	virtual void Update(float deltaTime, float totalTime) = 0;
 	virtual void Draw(float deltaTime, float totalTime) = 0;

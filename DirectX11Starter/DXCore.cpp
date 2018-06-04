@@ -195,6 +195,105 @@ HRESULT DXCore::InitDirectX() //requires a window
 
 }
 
+//Done so that window resizing does not change anything
+void DXCore::OnResize()
+{
+	if (depthStencilView) { depthStencilView->Release(); }
+	if (backBufferRTV) { backBufferRTV->Release(); }
+
+	swapChain->ResizeBuffers(
+		1,
+		width,
+		height,
+		DXGI_FORMAT_R8G8B8A8_UNORM,
+		0);
+
+	ID3D11Texture2D* backBufferTexture;
+	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBufferTexture));
+	device->CreateRenderTargetView(backBufferTexture, 0, &backBufferRTV);
+	backBufferTexture->Release();
+
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+	depthStencilDesc.Width = width;
+	depthStencilDesc.Height = height;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+
+	ID3D11Texture2D* depthBufferTexture;
+	device->CreateTexture2D(&depthStencilDesc, 0, &depthBufferTexture);
+	device->CreateDepthStencilView(depthBufferTexture, 0, &depthStencilView);
+	depthBufferTexture->Release();
+
+	context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
+
+	//to render into correct portion of the window
+	D3D11_VIEWPORT viewport = {};
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = (float)width;
+	viewport.Height = (float)height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	context->RSSetViewports(1, &viewport);
+
+}
+
+void DXCore::UpdateTimer()
+{
+}
+
+void DXCore::UpdateTitleBarStats()
+{
+}
+
+//MAIN GAME LOOP
+HRESULT DXCore::Run()
+{
+
+	__int64 now;
+	QueryPerformanceCounter((LARGE_INTEGER*)&now);
+	startTime = now;
+	currentTime = now;
+	previousTime = now;
+
+	Init();
+
+	MSG msg = {};
+
+	while (msg.message != WM_QUIT)
+	{
+		//see if there is a message waiting
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			UpdateTimer();
+			if (titleBarStats)
+			{
+				UpdateTitleBarStats();
+
+			}
+			Update(deltaTime, totalTime);
+			Draw(deltaTime, totalTime);
+		}
+	
+	}
+
+	return(HRESULT)msg.wParam;
+
+}
+
+
 LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return LRESULT();
