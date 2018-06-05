@@ -245,13 +245,7 @@ void DXCore::OnResize()
 
 }
 
-void DXCore::UpdateTimer()
-{
-}
 
-void DXCore::UpdateTitleBarStats()
-{
-}
 
 //MAIN GAME LOOP
 HRESULT DXCore::Run()
@@ -291,6 +285,63 @@ HRESULT DXCore::Run()
 
 	return(HRESULT)msg.wParam;
 
+}
+
+void DXCore::Quit()
+{
+	PostMessage(this->hWnd, WM_CLOSE, NULL, NULL);
+
+}
+
+
+void DXCore::UpdateTimer()
+{
+	__int64 now;
+	QueryPerformanceCounter((LARGE_INTEGER*)&now);
+	currentTime = now;
+
+	deltaTime = max((float)((currentTime - previousTime) *perfCounterSeconds), 0.0f);
+
+	totalTime = (float)((currentTime - startTime) * perfCounterSeconds);
+
+	previousTime = currentTime;
+}
+
+void DXCore::UpdateTitleBarStats()
+{
+	fpsFrameCount++;
+
+	float timeDiff = totalTime - fpsTimeElapsed;
+	if (timeDiff < 1.0f)
+		return;
+
+	//how long did each fram take?
+	float mspf = 1000.0f / (float)fpsFrameCount;
+
+	std::ostringstream output;
+	output.precision(6);
+	output << titleBartext <<
+		"Width: " << width <<
+		"Height: " << height <<
+		"FPS: " << fpsFrameCount <<
+		"Frame Time: " << mspf << "ms";
+		
+	switch (dxFeatureLevel)
+	{
+	case D3D_FEATURE_LEVEL_11_1: output << "     DX 11.1"; break;
+	case D3D_FEATURE_LEVEL_11_0: output << "     DX 11.0"; break;
+	case D3D_FEATURE_LEVEL_10_1: output << "     DX 10.1"; break;
+	case D3D_FEATURE_LEVEL_10_0: output << "     DX 10.0"; break;
+	case D3D_FEATURE_LEVEL_9_3:  output << "      DX 9.3"; break;
+	case D3D_FEATURE_LEVEL_9_2:  output << "      DX 9.2"; break;
+	case D3D_FEATURE_LEVEL_9_1:  output << "      DX 9.1"; break;
+	default:                     output << "      DX ???"; break;
+		
+	}
+	
+	SetWindowText(hWnd, output.str().c_str());
+	fpsFrameCount = 0;
+	fpsTimeElapsed += 1.0f;
 }
 
 
