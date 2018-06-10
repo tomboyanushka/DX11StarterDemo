@@ -294,6 +294,8 @@ void DXCore::Quit()
 }
 
 
+
+
 void DXCore::UpdateTimer()
 {
 	__int64 now;
@@ -344,9 +346,85 @@ void DXCore::UpdateTitleBarStats()
 	fpsTimeElapsed += 1.0f;
 }
 
+//console window for debugging
+void DXCore::CreateConsoleWindow(int bufferLines, int bufferColumns, int windowLines, int windowColumns)
+{
+	CONSOLE_SCREEN_BUFFER_INFO conInfo;
+
+	AllocConsole();
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &conInfo);
+	conInfo.dwSize.Y = bufferLines;
+	conInfo.dwSize.X = bufferColumns;
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), conInfo.dwSize);
+
+	SMALL_RECT rect;
+	rect.Left = 0;
+	rect.Right = windowColumns;
+	rect.Top = 0;
+	rect.Bottom = windowLines;
+	SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &rect);
+
+	FILE *stream;
+	freopen_s(&stream, "CONIN$", "r", stdin);
+	freopen_s(&stream, "CONOUT$", "w", stdout);
+	freopen_s(&stream, "CONOUT$", "w", stderr);
+
+	//to prevent accidental closing of window
+	HWND consoleHandle = GetConsoleWindow();
+	HMENU hmenu = GetSystemMenu(consoleHandle, FALSE);
+	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);
+
+}
 
 LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return LRESULT();
+	//check incoming message handle
+	switch (uMsg)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0); //send quit message to our own program
+		return 0;
+
+	case WM_MENUCHAR:
+		return MAKELRESULT(0, MNC_CLOSE);
+
+		//prevent window from becoming too small
+	case WM_GETMINMAXINFO:
+		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+		return 0;
+
+	case WM_SIZE:
+		if (wParam == SIZE_MINIMIZED)
+			return 0;
+
+		width = LOWORD(lParam);
+		height = HIWORD(lParam);
+
+		if (device)
+			OnResize();
+
+		return 0;
+
+		//mouse button pressed while cursor is over our window
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
+
+	case WM_MOUSEMOVE:
+		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
+	}
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
