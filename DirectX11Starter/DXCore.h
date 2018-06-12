@@ -10,7 +10,7 @@ class DXCore
 public:
 	DXCore(
 	HINSTANCE hInstance,
-		char* titleBarText,
+		const char* titleBarText,
 		unsigned int windowWidth,
 		unsigned int windowHeight,
 		bool debugTitleBarStats);

@@ -11,7 +11,7 @@ LRESULT DXCore::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 DXCore::DXCore(
 HINSTANCE hInstance,
-char* titleBarText,
+const char* titleBarText,
 unsigned int windowWidth,
 unsigned int windowHeight,
 bool debugTitleBarStats)
