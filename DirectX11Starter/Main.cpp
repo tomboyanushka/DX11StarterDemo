@@ -1,6 +1,7 @@
 #include "Main.h"
 #include <Windows.h>
 #include <crtdbg.h>
+#include "Game.h"
 
 
 
@@ -38,6 +39,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			SetCurrentDirectory(currentDir);
 		}
 	}
+
+	Game dxGame(hInstance);
+
+	HRESULT hr = S_OK;
+
+	hr = dxGame.InitWndow();
+	if (FAILED(hr)) return hr;
+
+	hr = dxGame.InitDirectX();
+	if (FAILED(hr)) return hr;
+
+	return dxGame.Run();
+
 
 	
 }
