@@ -3,6 +3,7 @@
 #include "SimpleShader.h"
 #include <DirectXmath.h>
 #include "Vertex.h"
+#include "Mesh.h"
 
 
 class Game : public DXCore
@@ -27,7 +28,9 @@ private:
 
 	void LoadShaders();
 	void CreateMatrices();
-	void CreateBasicGeometry();
+	void InitMesh();
+	void DrawMesh(Mesh* mesh);
+	
 
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
@@ -39,6 +42,10 @@ private:
 	DirectX::XMFLOAT4X4 viewMatrix;
 	DirectX::XMFLOAT4X4 projectionMatrix;
 
+
+	Mesh* mesh1;
+	Mesh* mesh2;
+	Mesh* mesh3;
 	POINT prevMousePos;
 	
 
