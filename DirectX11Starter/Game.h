@@ -23,13 +23,15 @@ public:
 	void OnMouseMove(WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta, int x, int y);
 
+	void DrawMesh(Mesh* mesh);
+
 
 private:
 
 	void LoadShaders();
 	void CreateMatrices();
-	void InitMesh();
-	void DrawMesh(Mesh* mesh);
+	void CreateMesh();
+	
 	
 
 	ID3D11Buffer* vertexBuffer;

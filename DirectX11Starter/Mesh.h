@@ -17,7 +17,7 @@ public:
 	int GetIndexCount();
 
 	void CreateBasicGeometry(Vertex* vertices, int vertexCount, int* indices, int indexCount, ID3D11Device *device);
-	void CreateMesh();
+	
 	
 
 
@@ -26,9 +26,7 @@ private:
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
 	int indexCount;
-
 	
-
 	
 };
 

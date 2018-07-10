@@ -29,19 +29,19 @@ Game::Game(HINSTANCE hInstance)
 //cleaning everything, even memory leaks
 Game::~Game()
 {
-
-	if (vertexBuffer) { vertexBuffer->Release(); }
-	if (indexBuffer) { indexBuffer->Release(); }
-
 	delete vertexShader;
 	delete pixelShader;
+
+	delete mesh1;
+	delete mesh2;
+	delete mesh3;
 }
 
 void Game::Init()
 {
 	LoadShaders();
 	CreateMatrices();
-	
+	CreateMesh();
 	
 
 	//what kind of shape do you want to draw?
@@ -93,7 +93,53 @@ void Game::CreateMatrices()
 
 }
 
-void Game::DrawMesh(Mesh * mesh)
+void Game::CreateMesh()
+{
+	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+
+	Vertex V1[] =
+	{
+
+	//for mesh1
+	{ XMFLOAT3(+1.0f, +2.0f, +0.0f), blue },
+	{ XMFLOAT3(+3.0f, +2.0f, +0.0f), red },
+	{ XMFLOAT3(+3.0f, +1.0f, +0.0f), blue },
+	{ XMFLOAT3(+1.0f, +1.0f, +0.0f), green },
+	};
+
+	Vertex V2[] =
+	{
+	//for mesh2
+	{ XMFLOAT3(+1.0f, -1.0f, +0.0f), red },
+	{ XMFLOAT3(+1.5f, -1.0f, +0.0f), blue },
+	{ XMFLOAT3(+1.5f, -1.5f, +0.0f), green },
+	{ XMFLOAT3(+1.0f, -1.5f, +0.0f), blue },
+
+	};
+	Vertex V3[] =
+	{
+	//for mesh3
+	{ XMFLOAT3(-1.0f, 2.0f, +0.0f), red },
+	{ XMFLOAT3(+0.0f, +0.0f, +0.0f), blue },
+	{ XMFLOAT3(-2.0f, 0.0f, +0.0f), green },
+
+	};
+
+	int indices[] = { 0, 1, 2, 2, 3, 0 };
+
+
+	mesh1 = new Mesh(V1, 4, indices, 6, device);
+
+	mesh2 = new Mesh(V2, 4, indices, 6, device);
+
+	mesh3 = new Mesh(V3, 3, indices, 3, device);
+
+}
+
+void Game::DrawMesh(Mesh* mesh)
 {
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -131,12 +177,6 @@ void Game::Update(float deltaTime, float TotalTime)
 
 //BASIC GEOMETRY TO DRAW -- FOR THIS CASE, A TRIANGLE
 
-
-
-void Game::InitMesh()
-{
-	&mesh1; 
-}
 
 void Game::Draw(float deltaTime, float TotalTime)
 {
