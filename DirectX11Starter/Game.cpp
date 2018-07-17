@@ -139,18 +139,6 @@ void Game::CreateMesh()
 
 }
 
-void Game::DrawMesh(Mesh* mesh)
-{
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	auto vertexBuffer = mesh->GetVertexBuffer();
-	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	context->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-
-	context->DrawIndexed(mesh->GetIndexCount(), 0, 0);
-}
-
-
 
 void Game::OnResize()
 {
@@ -238,6 +226,18 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 {
 	//add custom code for scrolling
 }
+
+void Game::DrawMesh(Mesh* mesh)
+{
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	auto vertexBuffer = mesh->GetVertexBuffer();
+	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	context->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+	context->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+}
+
 
 #pragma endregion
 
