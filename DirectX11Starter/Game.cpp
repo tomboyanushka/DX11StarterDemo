@@ -35,6 +35,12 @@ Game::~Game()
 	delete mesh1;
 	delete mesh2;
 	delete mesh3;
+
+	delete gameEntity1;
+	delete gameEntity2;
+	delete gameEntity3;
+	delete gameEntity4;
+	delete gameEntity5;
 }
 
 void Game::Init()
@@ -137,6 +143,24 @@ void Game::CreateMesh()
 
 	mesh3 = new Mesh(V3, 3, indices, 3, device);
 
+	gameEntity1 = new GameEntity(mesh1);
+	gameEntity2 = new GameEntity(mesh1);
+	gameEntity3 = new GameEntity(mesh2);
+	gameEntity4 = new GameEntity(mesh2);
+	gameEntity5 = new GameEntity(mesh3);
+
+
+}
+
+void Game::DrawEntity(GameEntity * gameEntityObject)
+{
+	vertexShader->SetMatrix4x4("world", gameEntityObject->GetMatrix());
+	vertexShader->SetMatrix4x4("view", viewMatrix);
+	vertexShader->SetMatrix4x4("projection", projectionMatrix);
+	vertexShader->CopyAllBufferData();
+	vertexShader->SetShader();
+	pixelShader->SetShader();
+	DrawMesh(gameEntityObject->GetMesh());
 }
 
 
@@ -154,11 +178,28 @@ void Game::OnResize()
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
 }
 
-void Game::Update(float deltaTime, float TotalTime)
+void Game::Update(float deltaTime, float totalTime)
 {
 	//quit if escape is hit
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+
+	gameEntity1->SetTranslation(XMFLOAT3(1.0f, 2.0f, 0.0f));
+	gameEntity1->SetScale(XMFLOAT3(0.5f, 1.5f, 0.0f));
+	
+	gameEntity2->SetTranslation(XMFLOAT3(sin(totalTime)*3.5f, 0.0f, 0.0f));
+	gameEntity2->SetScale(XMFLOAT3(abs(sin(totalTime))*1.0f, 1.0f, 1.f));
+
+	gameEntity3->SetTranslation(XMFLOAT3(0.0f, -3.0f, 0.f));
+	gameEntity3->SetRotation(sin(totalTime)*1.0f);
+	gameEntity3->SetScale(XMFLOAT3(0.3f, 0.5f, 0.0f));
+
+	gameEntity4->SetTranslation(XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	gameEntity4->SetScale(XMFLOAT3(0.5f, 0.5f, 0.0f));
+	
+	gameEntity5->SetTranslation(XMFLOAT3(-2.0f, -2.0f, 0.0f));
+	gameEntity5->SetScale(XMFLOAT3(0.5f, 0.5f, 0.0f));
+
 
 }
 
@@ -193,9 +234,12 @@ void Game::Draw(float deltaTime, float TotalTime)
 	vertexShader->SetShader();
 	pixelShader->SetShader();
 
-	DrawMesh(mesh1);
-	DrawMesh(mesh2);
-	DrawMesh(mesh3);
+	DrawEntity(gameEntity1);
+	DrawEntity(gameEntity2);
+	DrawEntity(gameEntity3);
+	DrawEntity(gameEntity4);
+	DrawEntity(gameEntity5);
+
 
 	swapChain->Present(0, 0);
 

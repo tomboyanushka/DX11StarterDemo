@@ -4,6 +4,9 @@
 #include <DirectXmath.h>
 #include "Vertex.h"
 #include "Mesh.h"
+#include "GameEntity.h"
+
+using namespace DirectX;
 
 
 class Game : public DXCore
@@ -40,14 +43,23 @@ private:
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
 
-	DirectX::XMFLOAT4X4 worldMatrix;
-	DirectX::XMFLOAT4X4 viewMatrix;
-	DirectX::XMFLOAT4X4 projectionMatrix;
+	XMFLOAT4X4 worldMatrix;
+	XMFLOAT4X4 viewMatrix;
+	XMFLOAT4X4 projectionMatrix;
 
 
 	Mesh* mesh1;
 	Mesh* mesh2;
 	Mesh* mesh3;
+
+	GameEntity* gameEntity1;
+	GameEntity* gameEntity2;
+	GameEntity* gameEntity3;
+	GameEntity* gameEntity4;
+	GameEntity* gameEntity5;
+
+	void DrawEntity(GameEntity* gameEntityObject);
+
 	POINT prevMousePos;
 	
 
