@@ -5,6 +5,7 @@
 #include "Vertex.h"
 #include "Mesh.h"
 #include "GameEntity.h"
+#include "Camera.h"
 
 using namespace DirectX;
 
@@ -51,6 +52,8 @@ private:
 	Mesh* mesh1;
 	Mesh* mesh2;
 	Mesh* mesh3;
+
+	Camera* camera;
 
 	GameEntity* gameEntity1;
 	GameEntity* gameEntity2;

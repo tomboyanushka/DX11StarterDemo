@@ -17,6 +17,7 @@ Game::Game(HINSTANCE hInstance)
 	indexBuffer = 0;
 	vertexShader = 0;
 	pixelShader = 0;
+	camera = 0;
 
 #if defined(DEBUG) || defined(_DEBUG)
 
@@ -41,6 +42,8 @@ Game::~Game()
 	delete gameEntity3;
 	delete gameEntity4;
 	delete gameEntity5;
+
+	delete camera;
 }
 
 void Game::Init()
@@ -96,6 +99,9 @@ void Game::CreateMatrices()
 		100.0f);
 
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+
+	camera = new Camera(0, 0, -5);
+	camera->UpdateProjectionMatrix((float)width / height);
 
 }
 
@@ -155,8 +161,8 @@ void Game::CreateMesh()
 void Game::DrawEntity(GameEntity * gameEntityObject)
 {
 	vertexShader->SetMatrix4x4("world", gameEntityObject->GetMatrix());
-	vertexShader->SetMatrix4x4("view", viewMatrix);
-	vertexShader->SetMatrix4x4("projection", projectionMatrix);
+	vertexShader->SetMatrix4x4("view", camera->GetViewMatrix());
+	vertexShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 	vertexShader->CopyAllBufferData();
 	vertexShader->SetShader();
 	pixelShader->SetShader();
@@ -176,6 +182,9 @@ void Game::OnResize()
 		100.0f);
 
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+
+	if (camera)
+		camera->UpdateProjectionMatrix((float)width / height);
 }
 
 void Game::Update(float deltaTime, float totalTime)
@@ -183,6 +192,8 @@ void Game::Update(float deltaTime, float totalTime)
 	//quit if escape is hit
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+
+	camera->Update(deltaTime);
 
 	gameEntity1->SetTranslation(XMFLOAT3(1.0f, 2.0f, 0.0f));
 	gameEntity1->SetScale(XMFLOAT3(0.5f, 1.5f, 0.0f));
@@ -222,18 +233,6 @@ void Game::Draw(float deltaTime, float TotalTime)
 		1.0f,
 		0);
 
-	//send data to shader variables
-	vertexShader->SetMatrix4x4("world", worldMatrix);
-	vertexShader->SetMatrix4x4("view", viewMatrix);
-	vertexShader->SetMatrix4x4("projection", projectionMatrix);
-
-	//send to GPU
-	vertexShader->CopyAllBufferData();
-
-	//set vertex and pixel shaders to use for next Draw() call
-	vertexShader->SetShader();
-	pixelShader->SetShader();
-
 	DrawEntity(gameEntity1);
 	DrawEntity(gameEntity2);
 	DrawEntity(gameEntity3);
@@ -262,6 +261,13 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 {
+	if (buttonState & 0x0001)
+	{
+		float xDiff = (x - prevMousePos.x) * 0.005f;
+		float yDiff = (y - prevMousePos.y) * 0.005f;
+		camera->Rotate(yDiff, xDiff);
+	}
+	
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 }
