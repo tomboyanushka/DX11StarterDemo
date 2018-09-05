@@ -13,7 +13,8 @@ struct VertexShaderInput
 	//  |    |                |
 	//  v    v                v
 	float3 position		: POSITION;     // XYZ position
-	float4 color		: COLOR;        // RGBA color
+	float3 normal		: NORMAL;        // Normals
+	float2 uv           : TEXCOORD;     //UVs
 
 };
 
@@ -22,7 +23,8 @@ struct VertexShaderInput
 struct VertexToPixel
 {
 	float4 position		: SV_POSITION;
-	float4 color		: COLOR;
+	float3 normal		: NORMAL;        
+	float2 uv           : TEXCOORD;
 };
 
 VertexToPixel main(VertexShaderInput input)
@@ -33,7 +35,7 @@ VertexToPixel main(VertexShaderInput input)
 
 	output.position = mul(float4(input.position, 1.0f), worldViewProj);
 
-	output.color = input.color;
+	//output.color = input.color;
 
 	return output;
 }

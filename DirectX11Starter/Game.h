@@ -16,7 +16,7 @@ class Game : public DXCore
 public:
 	Game(HINSTANCE hInstance);
 	~Game();
-
+	 
 	void Init();
 	void OnResize();
 	void Update(float deltaTime, float TotalTime);
@@ -26,6 +26,7 @@ public:
 	void OnMouseUp(WPARAM buttonState, int x, int y);
 	void OnMouseMove(WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta, int x, int y);
+
 
 	void DrawMesh(Mesh* mesh);
 
@@ -49,9 +50,9 @@ private:
 	XMFLOAT4X4 projectionMatrix;
 
 
-	Mesh* mesh1;
-	Mesh* mesh2;
-	Mesh* mesh3;
+	Mesh* chaletMesh;
+
+	GameEntity* chaletEntity;
 
 	Camera* camera;
 

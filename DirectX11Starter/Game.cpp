@@ -33,16 +33,6 @@ Game::~Game()
 	delete vertexShader;
 	delete pixelShader;
 
-	delete mesh1;
-	delete mesh2;
-	delete mesh3;
-
-	delete gameEntity1;
-	delete gameEntity2;
-	delete gameEntity3;
-	delete gameEntity4;
-	delete gameEntity5;
-
 	delete camera;
 }
 
@@ -107,53 +97,46 @@ void Game::CreateMatrices()
 
 void Game::CreateMesh()
 {
-	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	//XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	//XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	//XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
 
 	Vertex V1[] =
 	{
 
 	//for mesh1
-	{ XMFLOAT3(+1.0f, +2.0f, +0.0f), blue },
-	{ XMFLOAT3(+3.0f, +2.0f, +0.0f), red },
-	{ XMFLOAT3(+3.0f, +1.0f, +0.0f), blue },
-	{ XMFLOAT3(+1.0f, +1.0f, +0.0f), green },
+	{ XMFLOAT3(+1.0f, +2.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+3.0f, +2.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+3.0f, +1.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+1.0f, +1.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
 	};
 
 	Vertex V2[] =
 	{
 	//for mesh2
-	{ XMFLOAT3(+1.0f, -1.0f, +0.0f), red },
-	{ XMFLOAT3(+1.5f, -1.0f, +0.0f), blue },
-	{ XMFLOAT3(+1.5f, -1.5f, +0.0f), green },
-	{ XMFLOAT3(+1.0f, -1.5f, +0.0f), blue },
+	{ XMFLOAT3(+1.0f, -1.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+1.5f, -1.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+1.5f, -1.5f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+1.0f, -1.5f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
 
 	};
 	Vertex V3[] =
 	{
 	//for mesh3
-	{ XMFLOAT3(-1.0f, 2.0f, +0.0f), red },
-	{ XMFLOAT3(+0.0f, +0.0f, +0.0f), blue },
-	{ XMFLOAT3(-2.0f, 0.0f, +0.0f), green },
+	{ XMFLOAT3(-1.0f, 2.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(+0.0f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+	{ XMFLOAT3(-2.0f, 0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
 
 	};
 
 	int indices[] = { 0, 1, 2, 2, 3, 0 };
 
 
-	mesh1 = new Mesh(V1, 4, indices, 6, device);
+	chaletMesh = new Mesh("../../Assets/Models/cube.obj", device);
 
-	mesh2 = new Mesh(V2, 4, indices, 6, device);
+	chaletEntity = new GameEntity(chaletMesh);
 
-	mesh3 = new Mesh(V3, 3, indices, 3, device);
-
-	gameEntity1 = new GameEntity(mesh1);
-	gameEntity2 = new GameEntity(mesh1);
-	gameEntity3 = new GameEntity(mesh2);
-	gameEntity4 = new GameEntity(mesh2);
-	gameEntity5 = new GameEntity(mesh3);
 
 
 }
@@ -163,10 +146,17 @@ void Game::DrawEntity(GameEntity * gameEntityObject)
 	vertexShader->SetMatrix4x4("world", gameEntityObject->GetMatrix());
 	vertexShader->SetMatrix4x4("view", camera->GetViewMatrix());
 	vertexShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+
+
+
 	vertexShader->CopyAllBufferData();
 	vertexShader->SetShader();
+
+	pixelShader->CopyAllBufferData();
 	pixelShader->SetShader();
+
 	DrawMesh(gameEntityObject->GetMesh());
+
 }
 
 
@@ -195,34 +185,18 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
-	gameEntity1->SetTranslation(XMFLOAT3(1.0f, 2.0f, 0.0f));
-	gameEntity1->SetScale(XMFLOAT3(0.5f, 1.5f, 0.0f));
-	
-	gameEntity2->SetTranslation(XMFLOAT3(sin(totalTime)*3.5f, 0.0f, 0.0f));
-	gameEntity2->SetScale(XMFLOAT3(abs(sin(totalTime))*1.0f, 1.0f, 1.f));
-
-	gameEntity3->SetTranslation(XMFLOAT3(0.0f, -3.0f, 0.f));
-	gameEntity3->SetRotation(sin(totalTime)*1.0f);
-	gameEntity3->SetScale(XMFLOAT3(0.3f, 0.5f, 0.0f));
-
-	gameEntity4->SetTranslation(XMFLOAT3(-1.0f, 0.0f, 0.0f));
-	gameEntity4->SetScale(XMFLOAT3(0.5f, 0.5f, 0.0f));
-	
-	gameEntity5->SetTranslation(XMFLOAT3(-2.0f, -2.0f, 0.0f));
-	gameEntity5->SetScale(XMFLOAT3(0.5f, 0.5f, 0.0f));
+	chaletEntity->SetTranslation(XMFLOAT3(1, 0, 0));
+	chaletEntity->SetScale(XMFLOAT3(1, 1, 1));
 
 
 }
-
-
-//BASIC GEOMETRY TO DRAW -- FOR THIS CASE, A TRIANGLE
 
 
 void Game::Draw(float deltaTime, float TotalTime)
 {
 
 	//bg color
-	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
+	const float color[4] = { 0.4f, 0.7f, 0.75f, 0.0f };
 
 	//do this before drawing ANYTHING
 
@@ -233,11 +207,7 @@ void Game::Draw(float deltaTime, float TotalTime)
 		1.0f,
 		0);
 
-	DrawEntity(gameEntity1);
-	DrawEntity(gameEntity2);
-	DrawEntity(gameEntity3);
-	DrawEntity(gameEntity4);
-	DrawEntity(gameEntity5);
+	DrawEntity(chaletEntity);
 
 
 	swapChain->Present(0, 0);

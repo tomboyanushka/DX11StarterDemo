@@ -11,7 +11,7 @@ class GameEntity
 
 
 public:
-	GameEntity(Mesh *mesh);
+	GameEntity(Mesh *mesh); 
 	~GameEntity();
 
 	SimpleVertexShader* vertexShader;
