@@ -38,6 +38,8 @@ Game::~Game()
 
 void Game::Init()
 {
+	light1 = { XMFLOAT4(+0.1f, +0.1f, +0.1f, 1.0f), XMFLOAT4(+0.0f, +0.0f, +1.0f, +1.0f), XMFLOAT3(+0.0f, -1.0f, 0.0f) };
+	light2 = { XMFLOAT4(+1.1f, +0.1f, +0.1f, 1.0f), XMFLOAT4(+1.0f, +0.0f, +0.0f, +1.0f), XMFLOAT3(+1.0f, +0.0f, 0.0f) };
 	LoadShaders();
 	CreateMatrices();
 	CreateMesh();
@@ -147,7 +149,16 @@ void Game::DrawEntity(GameEntity * gameEntityObject)
 	vertexShader->SetMatrix4x4("view", camera->GetViewMatrix());
 	vertexShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 
+	pixelShader->SetData(
+		"light1",
+		&light1,
+		sizeof(DirectionalLight));
 
+
+	pixelShader->SetData(
+		"light2",
+		&light2,
+		sizeof(DirectionalLight));
 
 	vertexShader->CopyAllBufferData();
 	vertexShader->SetShader();

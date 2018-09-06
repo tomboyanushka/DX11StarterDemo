@@ -35,6 +35,8 @@ VertexToPixel main(VertexShaderInput input)
 
 	output.position = mul(float4(input.position, 1.0f), worldViewProj);
 
+	output.normal = mul(input.normal, (float3x3)world);
+
 	//output.color = input.color;
 
 	return output;

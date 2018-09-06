@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "GameEntity.h"
 #include "Camera.h"
+#include "Lights.h"
 
 using namespace DirectX;
 
@@ -55,6 +56,9 @@ private:
 	GameEntity* chaletEntity;
 
 	Camera* camera;
+
+	DirectionalLight light1;
+	DirectionalLight light2;
 
 	GameEntity* gameEntity1;
 	GameEntity* gameEntity2;
